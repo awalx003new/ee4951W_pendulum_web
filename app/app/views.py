@@ -10,8 +10,11 @@ app = Flask(__name__, static_folder='static')
 # For POST request
 app.secret_key = b'naan68P"Kl5Gif&re/Hetunp/'
 
-# Maximum file size is 16 MB
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
+# Maximum file size is 16 MB?
+app.config['MAX_CONTENT_PATH'] = 16 * 1000 * 1000
+
+# Uploads folder is in current directory
+app.config['UPLOAD_FOLDER'] = "./Uploads"
 
 #UPLOAD_DESTINATION = "instance/Uploads/"
 #PROCESSING_FILE = "upload.py"
@@ -43,14 +46,19 @@ def upload_file():
 
     uploaded_file = request.files['file']
 
+    # Save uploaded file to "Uploads" folder in current directory
+    uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(uploaded_file.filename)))
+
     # Get the file name and encode it in ASCII format
-    #nameOfFile = uploaded_file.filename
-    #print(nameOfFile)
-    #nameOfFile.encode(encoding="ascii")
+    nameOfFile = uploaded_file.filename
+    nameOfFile.encode(encoding="ascii")
+
+    #Open the uploaded file in "read" mode
+    #openFile = open(app.config['UPLOAD_FOLDER'] + "/" + nameOfFile,"r")
 
     # Store the Contents of the uploaded file as a string and then encode the contents in ASCII format
     #fileContents = uploaded_file.read()
-    #print("file Contents printed = " + fileContents)
+    #print(fileContents)
     #fileContents.encode(encoding="ascii")
 
     # Open upload.py and write the contents of the uploaded file there
@@ -62,7 +70,13 @@ def upload_file():
     # Remove the created "Uploads" directory, otherwise, each time that the web server is run, directory creation is recursive
     #os.rmdir(UPLOAD_DESTINATION)
 
-    return redirect(url_for('index'))
+    #return redirect(url_for('index'))
+    #return render_template("index.html")
+    return "File upload is successful!"
+
+#@app.route('/results')
+#def
+
 
 @app.route('/github_repo')
 def gitHub_repo():
@@ -102,5 +116,3 @@ if __name__ == '__main__':
     #Use Sam's domain name (DNS) instead of local host
     #DNS=192.168.71.241
     app.run(debug=True)
-
-    #this is a comment
