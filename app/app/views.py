@@ -1,6 +1,7 @@
 #---------------------------------------------------------imports---------------------------------------------------------------#
 from flask import Flask, jsonify, request, render_template, make_response, redirect, url_for, send_from_directory, flash, Request
 import os
+import subprocess
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__, static_folder='static')
@@ -8,22 +9,32 @@ app = Flask(__name__, static_folder='static')
 
 # Set the secret key to some random bytes. Needs to be top secret!
 # For POST request
-app.secret_key = b'naan68P"Kl5Gif&re/Hetunp/'
+app.secret_key = "ski u mah"
 
-# Maximum file size is 16 MB?
-app.config['MAX_CONTENT_PATH'] = 16 * 1000 * 1000
+# Maximum file size is 16 MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
 # Uploads folder is in current directory
-app.config['UPLOAD_FOLDER'] = "./Uploads"
+app.config['UPLOAD_FOLDER'] = "./FileProcessing/Uploads"
 
-#UPLOAD_DESTINATION = "instance/Uploads/"
+DOWNLOAD_DIRECTORY = "./FileProcessing/Downloads"
+
+UPLOAD_DESTINATION = "./FileProcessing/Uploads"
+RESULTS_DESTINATION = "./FileProcessing/Results"
+
+ALLOWED_EXTENSIONS = {'py'}
 #PROCESSING_FILE = "upload.py"
 
 # Create an 'Uploads' directory in a known location --> this directory is where files are saved to
 #uploads_directory = os.path.join(app.instance_path, UPLOAD_DESTINATION)
 #os.makedirs(uploads_directory, exist_ok=True)
 
+#---------------------------------------------------------methods------------------------------------------------------------------#
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 #---------------------------------------------------------decorators---------------------------------------------------------------#
+# For domain name
 @app.route('/')
 def home_page():
     return render_template("base.html")
@@ -37,47 +48,105 @@ def favicon():
 def actuatepage():
     return render_template("index.html")
 
-# *before* redirecting to route for index
+# Redirect to route for index
 @app.route('/index', methods=['POST'])
 def upload_file():
+    # Check if the POST request has the file part
     if 'file' not in request.files:
         flash('No file part')
-        return redirect(request.url)
+        return render_template("index.html")
 
     uploaded_file = request.files['file']
+    if uploaded_file.filename == '':
+        # Display this message in the website when the user has not chosen a file
+        flash('No file selected for uploading', "warning")
+        return render_template("index.html")
 
-    # Save uploaded file to "Uploads" folder in current directory
-    uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(uploaded_file.filename)))
+    if uploaded_file and allowed_file(uploaded_file.filename):
+        # Get the file name
+        nameOfFile = secure_filename(uploaded_file.filename)
 
-    # Get the file name and encode it in ASCII format
-    nameOfFile = uploaded_file.filename
-    nameOfFile.encode(encoding="ascii")
+        # Save uploaded file to "Uploads" folder in current directory
+        uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], nameOfFile))
 
-    #Open the uploaded file in "read" mode
-    #openFile = open(app.config['UPLOAD_FOLDER'] + "/" + nameOfFile,"r")
+        # Open the ("Uploads/" conconcatenated with "filename") file for read
+        userFile = open(UPLOAD_DESTINATION + "/" + nameOfFile, "r")
 
-    # Store the Contents of the uploaded file as a string and then encode the contents in ASCII format
-    #fileContents = uploaded_file.read()
-    #print(fileContents)
-    #fileContents.encode(encoding="ascii")
+        fileContents = userFile.read()
 
-    # Open upload.py and write the contents of the uploaded file there
-    # Since upload.py does not already exist, it will get created automatically
-    #processingFile = open(UPLOAD_DESTINATION + PROCESSING_FILE, "w")
-    #processingFile.write(fileContents)
-    #processingFile.close()
+        userFile.close()
 
-    # Remove the created "Uploads" directory, otherwise, each time that the web server is run, directory creation is recursive
-    #os.rmdir(UPLOAD_DESTINATION)
+        # Please note that "upload.py" is the test file
+        # Open the ("Uploads/" conconcatenated with "upload.py") file for read/write.  Create upload.py if it does not already exist
+        processingFile = open(UPLOAD_DESTINATION + "/" + "upload.py", "w+")
 
-    #return redirect(url_for('index'))
+        # write the "file_content" to the upload file object
+        processingFile.write(fileContents)
+
+        # Close the upload.py file object
+        processingFile.close()
+
+        # Retrieve the name of the userFile - without the file extension "py"
+        results_custom_filename = nameOfFile.split(".")[0]
+
+        # Create custom filename for results.csv file
+        results_custom_filename = results_custom_filename + "_results.csv"
+
+        # Now, actually create that file
+        customResultsFile = open(RESULTS_DESTINATION + "/" + results_custom_filename, "x")
+
+        # Close that file
+        customResultsFile.close()
+
+        # Name of file object is "results" - open it in read mode
+        with open(RESULTS_DESTINATION + "/" + results_custom_filename, "r") as customResultsFile:
+            resultsContents = customResultsFile.read()
+            customResultsFile.close()
+    else:
+        # Display this message in the website when the user has chosen a non-Python file
+        flash('The file type specified is not allowed for upload.  Allowed file type is .py', "danger")
+        return render_template('index.html')
+
+    #PLEASE note: What's below seems to work, but something I noticed is that if the test file has "import" lines, those modules that Python is looking for won't be found
+    # Run new python script
+    # Popen has an array of command line arguments; execute "python" program, with ("Uploads/" conconcatenated with "filename") command for process
+    #process = subprocess.Popen(["python", UPLOAD_DESTINATION + "/" + "upload.py"])
+
+    #try:
+        # Wait for completion of child process
+        #process.wait()
+        #print("Program exited normally!\n")
+    #except:
+        #print("Exception occurred running program!\n")
+        #process.terminate()
+    #finally:
+        #GPIO.cleanup()
+
+    #-------------------------------------------------------------
+    # Test the os.remove after affirming operation of running new python script
+    # Remove test file and custom results file now that we are done with them
+    #os.remove(UPLOAD_DESTINATION + "/" + "upload.py")
+    #os.remove(RESULTS_DESTINATION + "/" + results_custom_filename)
+
+    #-----------------------------------------------------------------
+    return redirect(url_for('results_page'))
     #return render_template("index.html")
-    return "File upload is successful!"
+    #return "File upload is successful!"
 
-#@app.route('/results')
-#def
+@app.route('/results')
+def results_page():
+    # Display this message in the website after the file has been uploaded
+    flash('File uploaded successfully!', "success")
+    return render_template("results.html")
 
+@app.route('/Downloads/<path:csv_file>', methods=['GET', 'POST'])
+def download(csv_file):
+    try:
+        return send_from_directory(DOWNLOAD_DIRECTORY, csv_file, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
 
+# For button that redirects the user to our GitHub repository
 @app.route('/github_repo')
 def gitHub_repo():
     return redirect("https://github.com/awalx003new/ee4951W_pendulum_web")

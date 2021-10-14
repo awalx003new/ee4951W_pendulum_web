@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+{% extends "public/templates/public_template.html" %}
+<html lang="en" dir="ltr">
+  <head>
+    {% block title %}Results{% endblock %}
+
+{% block main %}
+
+<div class="header">
+  <div class="row">
+
+    <div class="col">
+
+      <h1 id="title">Results</h1>
+      <hr>
+        <!--The following lines are for the flash() message-->
+        {% with errors = get_flashed_messages(category_filter=["success"]) %}
+              {% if errors %}
+                  {%- for message in errors %}
+                      <div class="alert alert-success alert-dismissible fade show" role="alert">
+                          <span>{{ message }}</span>
+                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                      </div>
+                  {% endfor -%}
+              {% endif %}
+          {% endwith %}
+
+      <body>
+        <form method="get" action="{{ url_for('download', csv_file="results.csv") }}">
+            <button type="submit">Download Results File</button>
+        </form>
+
+          <button onClick="window.location.href='http://127.0.0.1:5000/index';">Upload Another File!</button>
+
+      </body>
+
+      <!--The following lines are for the flash() message
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}-->
+
+
+
+      <hr>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+    <script>
+    </script>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+
+  <body>
+  <h1> Python Fetch Example</h1>
+  <p id='embed'>{{embed}}</p>
+  <p id='mylog'/>
+  <body>
+</html>
