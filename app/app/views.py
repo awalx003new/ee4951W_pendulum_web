@@ -56,6 +56,8 @@ def upload_file():
         flash('No file part')
         return render_template("index.html")
 
+    fileSize = request.cookies.get("filesize")
+
     uploaded_file = request.files['file']
     if uploaded_file.filename == '':
         # Display this message in the website when the user has not chosen a file
