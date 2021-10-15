@@ -56,7 +56,7 @@ def upload_file():
         flash('No file part')
         return render_template("index.html")
 
-    fileSize = request.cookies.get("filesize")
+    #fileSize = request.cookies.get("filesize")
 
     uploaded_file = request.files['file']
     if uploaded_file.filename == '':
