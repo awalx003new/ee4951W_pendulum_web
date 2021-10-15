@@ -28,7 +28,7 @@
           {% endwith %}
 
       <body>
-        <form method="get" action="{{ url_for('download', csv_file="results.csv") }}">
+        <form method="get" action="{{ url_for('download', filename="results.csv") }}">
             <button type="submit">Download Results File</button>
         </form>
 

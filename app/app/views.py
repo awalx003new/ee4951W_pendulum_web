@@ -139,10 +139,10 @@ def results_page():
     flash('File uploaded successfully!', "success")
     return render_template("results.html")
 
-@app.route('/Downloads/<path:csv_file>', methods=['GET', 'POST'])
-def download(csv_file):
+@app.route('/Downloads/<path:filename>', methods=['GET', 'POST'])
+def download(filename):
     try:
-        return send_from_directory(DOWNLOAD_DIRECTORY, csv_file, as_attachment=True)
+        return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
     except FileNotFoundError:
         abort(404)
 
