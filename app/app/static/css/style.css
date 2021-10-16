@@ -65,15 +65,51 @@ a:hover{
 }
 
 #myProgress {
-  /* Background of progress bar */
+  /* Background shape of progress bar */
+  /* Allow the background shape to not be flush with the edge of the website window */
   width: auto;
   background-color: #ddd;
-  margin:30px;
+  margin:40px;
+  border-radius: 50px;
 }
 
 #myBar {
-  /* Displays current progress */
+  /* Displays current progress - Candy Stripe style */
+  display: block;
+  position: relative;
   width: 0%;
-  height: 30px;
+  height: 20px;
   background-color: blue;
+  border-radius: 50px;
+  /*#ffbb00 is similar to gold and #ed9339 is similar to pumpkin orange */
+  background-image: linear-gradient(to bottom, #ffbb00, #ed9339);
+  box-shadow:
+    inset 0 -2px 1px  rgba(255,255,255,0.3),
+    inset 0 -2px 6px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+#myProgress > #myBar::after {
+  /* Displays current progress - Candy Stripe style */
+  /* This function is for allowing the linear gradient of the progress bar to stay at the same angle during animation */
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background-image: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, .2) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, .2) 50%,
+    rgba(255, 255, 255, .2) 75%,
+    transparent 75%,
+    transparent
+    );
+    z-index: 1;
+    background-size: 50px 50px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    overflow: hidden;
 }

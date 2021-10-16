@@ -2,6 +2,8 @@
 {% extends "public/templates/public_template.html" %}
 <html lang="en" dir="ltr">
   <head>
+    <!--for favicon.ico-->
+    <link rel="icon" href="data:,">
     {% block title %}Results{% endblock %}
 
 {% block main %}
@@ -13,6 +15,7 @@
 
       <h1 id="title">Results</h1>
       <hr>
+
         <!--The following lines are for the flash() message-->
         {% with errors = get_flashed_messages(category_filter=["success"]) %}
               {% if errors %}

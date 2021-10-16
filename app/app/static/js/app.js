@@ -24,7 +24,8 @@ function toggleAbout(){
 function update() {
   var element = document.getElementById("myBar");
   var width = 1;
-  var identity = setInterval(scene, 10);
+  // Every 5 milliseconds, the function scene() will be called
+  var identity = setInterval(scene, 5);
   function scene() {
     if (width >= 100) {
       clearInterval(identity);

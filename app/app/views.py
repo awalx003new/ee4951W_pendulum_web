@@ -49,6 +49,7 @@ def actuatepage():
     return render_template("index.html")
 
 # Redirect to route for index
+# Receive form data from upload button
 @app.route('/index', methods=['POST'])
 def upload_file():
     # Check if the POST request has the file part
@@ -112,7 +113,8 @@ def upload_file():
     #PLEASE note: What's below seems to work, but something I noticed is that if the test file has "import" lines, those modules that Python is looking for won't be found
     # Run new python script
     # Popen has an array of command line arguments; execute "python" program, with ("Uploads/" conconcatenated with "filename") command for process
-    #process = subprocess.Popen(["python", UPLOAD_DESTINATION + "/" + "upload.py"])
+    # "python3" is used because we are using a Linux operating system on the NVIDIA Jetson?
+    #process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + "upload.py"])
 
     #try:
         # Wait for completion of child process
@@ -182,8 +184,8 @@ def gitHub_repo():
 #########  run app  #########
 
 if __name__ == '__main__':
-    #app.run(debug=True, host='0.0.0.0')
-    #repopulate app.routes with statc IP address for controls lab
+    #repopulate app.routes with static IP address for controls lab
     #Use Sam's domain name (DNS) instead of local host
     #DNS=192.168.71.241
+    #app.run(host="<IP_Address>", port=<port_number>, debug=True)
     app.run(debug=True)
