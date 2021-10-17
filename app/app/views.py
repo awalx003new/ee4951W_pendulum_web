@@ -1,6 +1,8 @@
 #---------------------------------------------------------imports---------------------------------------------------------------#
 from flask import Flask, jsonify, request, render_template, make_response, redirect, url_for, send_from_directory, flash, Request
-import os
+import os # Use for path navigation
+import sys # Use for path navigation
+import time # Use for sleep()
 import subprocess
 from werkzeug.utils import secure_filename
 
@@ -14,13 +16,13 @@ app.secret_key = "ski u mah"
 # Maximum file size is 16 MB
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
-# Uploads folder is in current directory
-app.config['UPLOAD_FOLDER'] = "./FileProcessing/Uploads"
+# Uploads folder is in current after changing directory to ./FileProcessing/Uploads directory
+app.config['UPLOAD_FOLDER'] = "."
 
 DOWNLOAD_DIRECTORY = "./FileProcessing/Downloads"
 
 UPLOAD_DESTINATION = "./FileProcessing/Uploads"
-RESULTS_DESTINATION = "./FileProcessing/Results"
+RESULTS_DESTINATION = "."
 
 ALLOWED_EXTENSIONS = {'py'}
 #PROCESSING_FILE = "upload.py"
@@ -49,7 +51,7 @@ def actuatepage():
     return render_template("index.html")
 
 # Redirect to route for index
-# Receive form data from upload 
+# Receive form data from upload
 @app.route('/index', methods=['POST'])
 def upload_file():
     # Check if the POST request has the file part
@@ -66,6 +68,35 @@ def upload_file():
         return render_template("index.html")
 
     if uploaded_file and allowed_file(uploaded_file.filename):
+        # Create "Uploads" folder
+        uploads_dir = "Uploads"
+
+        absolutepath = os.path.abspath(__file__)
+        print(absolutepath)
+
+        fileDirectory = os.path.dirname(absolutepath)
+        print(fileDirectory)
+
+        #Navigate to ./FileProcessing directory
+        newPath1 = os.path.join(fileDirectory, 'FileProcessing')
+        print(newPath1)
+
+        #Navigate to ./Uploads directory
+        newPath2 = os.path.join(newPath1, uploads_dir)
+        print(newPath1)
+
+        # Make directory called "Uploads"
+        # mode: read, write, and execute permissions for user, owner, and group
+        mode = 0o777
+        os.mkdir(newPath2, mode)
+
+        # change directory to "Uploads"
+        os.chdir(newPath2)
+
+        # Get current working Directory
+        #print("Current working directory is ")
+        #print(os.getcwd())
+
         # Get the file name
         nameOfFile = secure_filename(uploaded_file.filename)
 
@@ -73,7 +104,7 @@ def upload_file():
         uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], nameOfFile))
 
         # Open the ("Uploads/" conconcatenated with "filename") file for read
-        userFile = open(UPLOAD_DESTINATION + "/" + nameOfFile, "r")
+        userFile = open("." + "/" + nameOfFile, "r")
 
         fileContents = userFile.read()
 
@@ -81,7 +112,7 @@ def upload_file():
 
         # Please note that "upload.py" is the test file
         # Open the ("Uploads/" conconcatenated with "upload.py") file for read/write.  Create upload.py if it does not already exist
-        processingFile = open(UPLOAD_DESTINATION + "/" + "upload.py", "w+")
+        processingFile = open("." + "/" + "upload.py", "w+")
 
         # write the "file_content" to the upload file object
         processingFile.write(fileContents)
@@ -95,6 +126,20 @@ def upload_file():
         # Create custom filename for results.csv file
         results_custom_filename = results_custom_filename + "_results.csv"
 
+        # Create "Results" folder
+
+        results_dir = "Results"
+
+        #Navigate to ./Results directory
+        newPath3 = os.path.join(newPath1, results_dir)
+
+
+        # Make directory called "Results"
+        os.mkdir(newPath3, mode)
+
+        # change directory to "Results"
+        os.chdir(newPath3)
+
         # Now, actually create that file
         customResultsFile = open(RESULTS_DESTINATION + "/" + results_custom_filename, "x")
 
@@ -104,7 +149,14 @@ def upload_file():
         # Name of file object is "results" - open it in read mode
         with open(RESULTS_DESTINATION + "/" + results_custom_filename, "r") as customResultsFile:
             resultsContents = customResultsFile.read()
-            customResultsFile.close()
+            # customResultsFile.close() automatically done with "with...as" statement
+
+        #print("Current dir = ")
+        #print(os.getcwd())
+
+        #print("this is newPath3")
+        #print(newPath3)
+
     else:
         # Display this message in the website when the user has chosen a non-Python file
         flash('The file type specified is not allowed for upload.  Allowed file type is .py', "danger")
@@ -126,11 +178,42 @@ def upload_file():
     #finally:
         #GPIO.cleanup()
 
-    #-------------------------------------------------------------
-    # Test the os.remove after affirming operation of running new python script
-    # Remove test file and custom results file now that we are done with them
-    #os.remove(UPLOAD_DESTINATION + "/" + "upload.py")
-    #os.remove(RESULTS_DESTINATION + "/" + results_custom_filename)
+    # -----------------Remove contents of Results folder-----------------------
+
+    # Change back to FileProcessing folder (from current working directory) so we can properly delete Results folder later on
+    os.chdir("..")
+
+    # Get list of all files in Results folder
+    results_files_list = os.listdir(newPath3)
+
+    # Remove all files in Results folder
+    for i in results_files_list:
+        os.remove(newPath3+"/"+i)
+        print("here A")
+
+    try:
+        os.rmdir(newPath3)
+        print("here B")
+    except OSError as e:
+        print("Error: %s : %s" % (newPath3, e.strerror))
+
+    # -----------------Remove contents of Uploads folder-----------------------
+    # Here, we are still at the FileProcessing folder
+
+    # Get list of all files in Uploads folder
+    results_files_list = os.listdir(newPath2)
+
+    # Remove all files in Uploads folder
+    for j in results_files_list:
+        os.remove(newPath2+"/"+j)
+        print("here C")
+
+    # Delete Uploads folder
+    try:
+        os.rmdir(newPath2)
+        print("here D")
+    except OSError as e:
+        print("Error: %s : %s" % (newPath2, e.strerror))
 
     #-----------------------------------------------------------------
     return redirect(url_for('results_page'))
