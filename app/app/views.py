@@ -49,7 +49,7 @@ def actuatepage():
     return render_template("index.html")
 
 # Redirect to route for index
-# Receive form data from upload button
+# Receive form data from upload 
 @app.route('/index', methods=['POST'])
 def upload_file():
     # Check if the POST request has the file part
