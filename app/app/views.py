@@ -115,19 +115,28 @@ def upload_file():
         # Close the upload.py file object
         processingFile.close()
 
+        #-----------------------------------Run Test File--------------------------------------------------------------------------------------
+
+        #PLEASE note: What's below seems to work, but something I noticed is that if the test file has "import" lines, those modules that Python is looking for won't be found
+        # Run new python script
+        # Popen has an array of command line arguments; execute "python3" program, with ("Uploads/" conconcatenated with "filename") command for process
+        # "python3" is used because we are using a Raspberry Pi terminal
+        #subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+
+        #-----------------------------------End of running Test File--------------------------------------------------------------------------------------
+
         # Retrieve the name of the userFile - without the file extension "py"
         results_custom_filename = nameOfFile.split(".")[0]
 
         # Create custom filename for results.csv file
         results_custom_filename = results_custom_filename + "_results.csv"
 
-        # Create "Results" folder
+        #--------------------------------------------Create "Results" folder---------------------------------------------------
 
         results_dir = "Results"
 
         #Navigate to ./Results directory
         newPath3 = os.path.join(newPath1, results_dir)
-
 
         # Make directory called "Results"
         os.mkdir(newPath3, mode)
@@ -149,12 +158,6 @@ def upload_file():
         # Display this message in the website when the user has chosen a non-Python file
         flash('The file type specified is not allowed for upload.  Allowed file type is .py', "danger")
         return render_template('index.html')
-
-    #PLEASE note: What's below seems to work, but something I noticed is that if the test file has "import" lines, those modules that Python is looking for won't be found
-    # Run new python script
-    # Popen has an array of command line arguments; execute "python" program, with ("Uploads/" conconcatenated with "filename") command for process
-    # "python3" is used because we are using a Linux operating system on the NVIDIA Jetson?
-    #process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + "upload.py"])
 
     #try:
         # Wait for completion of child process
