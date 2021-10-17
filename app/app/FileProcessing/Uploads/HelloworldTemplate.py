@@ -1,0 +1,23 @@
+'''
+Code created by Matt Richardson 
+for details, visit:  http://mattrichardson.com/Raspberry-Pi-Flask/inde...
+'''
+from flask import Flask, render_template
+import datetime
+app = Flask(__name__)
+@app.route("/")
+def hello():
+   now = datetime.datetime.now()
+   timeString = now.strftime("%Y-%m-%d %H:%M")
+   templateData = {
+      'title' : 'HELLO!',
+      'time': timeString
+      }
+   return render_template('index.html', **templateData)
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico',mimetype='image/vnd/microsoft.icon')
+
+if __name__ == "__main__":
+   app.run(host='0.0.0.0', port=80, debug=True)
