@@ -1,13 +1,17 @@
 <html>
     <head>
-        <!--for favicon.ico-->
-        <link rel="icon" href="data:,">
         <link rel="stylesheet" href="/static/css/style.css">
+        <!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script type="text/javascript" src="/static/js/app.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+        <!--Add custom favicon for browser tab-->
+        <link rel = "icon" href = "static/img/site_logo.png" type = "image/x-icon">
 
     </head>
     <body>
+      <!--Logo-->
+    <img src="static/img/site_logo.png" alt="Server and Pendulum" width="160" height="130">
 		<title>Remotely Accessible Inverted Pendulum</title>
 		<nav class = "header">
             <h1 id="title">Remotely Accessible Inverted Pendulum</h1>
@@ -34,9 +38,9 @@
                     Controlled movements are determined by measuring the position and speed of the pendulum and base.
                 </p>
 
-               <button onClick="window.location.href='http://127.0.0.1:5000/github_repo';">Our GitHub repository </button>
+               <!--<button onClick="window.location.href='http://127.0.0.1:5000/github_repo';">Our GitHub repository </button>
 
-                <button onClick="window.location.href='http://127.0.0.1:5000/index';">To the pendulum! </button>
+                <button onClick="window.location.href='http://127.0.0.1:5000/index';">To the pendulum! </button>-->
 
 
             </div>
@@ -52,5 +56,19 @@
             <!--    default content -->
             {% endblock %}
         </div>
+
+              <!-- Top Navigation Menu -->
+      <div class="topnav">
+        <a href="http://127.0.0.1:5000" class="active">Home</a>
+        <!-- Navigation links (hidden by default) -->
+        <div id="myLinks">
+          <a href="http://127.0.0.1:5000/index">To the pendulum!</a>
+          <a href="http://127.0.0.1:5000/github_repo">Our GitHub Repository</a>
+        </div>
+        <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+          <i class="fa fa-bars"></i>
+        </a>
+      </div>
     </body>
 </html>

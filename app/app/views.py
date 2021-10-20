@@ -6,7 +6,7 @@ import os
 import secrets
 # Use for running a python script
 import subprocess
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 from werkzeug.utils import secure_filename
 
 # The 'static_folder' argument is the folder with static files that is served at
@@ -122,16 +122,18 @@ def upload_file():
         # Run new python script
         # Popen has an array of command line arguments; execute "python3" program, with ("Uploads/" conconcatenated with "filename") command for process
         # "python3" is used because we are using a Raspberry Pi terminal
-        process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
-        try:
-            process.wait()
-            print("Program exited normally!\n")
-        except:
-            print("Exception occurred running program!\n")
-            process.terminate()
-        finally:
-            #Make sure this works
-            GPIO.cleanup()
+        # process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+
+        #Add timer - so that subprocess can stop after a certain amount of time
+        # try:
+        #     process.wait()
+        #     print("Program exited normally!\n")
+        # except:
+        #     print("Exception occurred running program!\n")
+        #     process.terminate()
+        # finally:
+        #     #Make sure this works
+        #     GPIO.cleanup()
         #-----------------------------------End of running Test File--------------------------------------------------------------------------------------
 
         # Retrieve the name of the userFile - without the file extension "py"

@@ -4,8 +4,11 @@
     border-style: solid;
     border: 1px solid #d5d6d2;
     text-align: center;
+    vertical-align: middle;
     margin:5px;
     font-family: "Times New Roman", Times, serif;
+    /* Lower the priority of the z-index so that the img can go on top*/
+    z-index: -1;
 }
 
 /* Customize HTML paragraph element margins */
@@ -15,6 +18,13 @@ p {
   margin-bottom: 1em;
   margin-left: 10em;
   margin-right: 10em;
+}
+
+/* Customize the positioning of the logo */
+img {
+  /*Image stays to the left of the body container*/
+  float: left;
+  margin-left: 30px;
 }
 
 .button {
@@ -121,4 +131,55 @@ a:hover{
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
     overflow: hidden;
+}
+
+/*For hamburger menu (triple bar icon) */
+/* Style the navigation menu */
+.topnav {
+  overflow: hidden;
+  background-color: maroon;
+  position: fixed;
+  margin-right: 14px;
+  margin-top: 9px;
+  top: 0;
+  right: 0;
+}
+
+/* Hide the links inside the navigation menu (except for logo/home) */
+.topnav #myLinks {
+  display: none;
+}
+
+/* Style navigation menu links */
+.topnav a {
+  /* Color of all the text */
+  color: #ffbb00;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  font-family: "Biome", sans-serif;
+  display: block;
+}
+
+/* Style the hamburger menu */
+.topnav a.icon {
+  background: maroon;
+  display: block;
+  position: fixed;
+  margin-right: 14px;
+  margin-top: 9px;
+  right: 0;
+  top: 0;
+}
+
+/* Add a grey background color on mouse-over */
+.topnav a:hover {
+  background-color: maroon;
+  color: white;
+}
+
+/* Style the active link (or home/logo) */
+.active {
+  background-color: maroon;
+  color: #ffbb00;
 }
