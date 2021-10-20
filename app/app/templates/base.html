@@ -2,7 +2,7 @@
     <head>
         <link rel="stylesheet" href="/static/css/style.css">
         <!-- Load an icon library to show a hamburger menu (bars) on small screens -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
         <script type="text/javascript" src="/static/js/app.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
         <!--Add custom favicon for browser tab-->
@@ -41,15 +41,12 @@
                <!--<button onClick="window.location.href='http://127.0.0.1:5000/github_repo';">Our GitHub repository </button>
 
                 <button onClick="window.location.href='http://127.0.0.1:5000/index';">To the pendulum! </button>-->
-
-
             </div>
 
             <br>
-            <br>
-        </nav
+        </nav>
         <div>
-          <!--repopulate link with statc P address for controls lab -->
+          <!--repopulate link with statc IP address for controls lab -->
         </div>
         <div id="main">
             {% block content %}
@@ -57,18 +54,11 @@
             {% endblock %}
         </div>
 
-              <!-- Top Navigation Menu -->
-      <div class="topnav">
-        <a href="http://127.0.0.1:5000" class="active">Home</a>
-        <!-- Navigation links (hidden by default) -->
-        <div id="myLinks">
-          <a href="http://127.0.0.1:5000/index">To the pendulum!</a>
-          <a href="http://127.0.0.1:5000/github_repo">Our GitHub Repository</a>
-        </div>
-        <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
-        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-          <i class="fa fa-bars"></i>
-        </a>
-      </div>
+          <ul>
+            <li><a href="http://127.0.0.1:5000">Home</a></li>
+            <li><a href="http://127.0.0.1:5000/index">To the Pendulum!</a></li>
+            <li><a href="http://127.0.0.1:5000/github_repo">Our GitHub Repository</a></li>
+          </ul>
+
     </body>
 </html>

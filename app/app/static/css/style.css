@@ -5,10 +5,10 @@
     border: 1px solid #d5d6d2;
     text-align: center;
     vertical-align: middle;
+    position: relative;
+    top: 30px;
     margin:5px;
     font-family: "Times New Roman", Times, serif;
-    /* Lower the priority of the z-index so that the img can go on top*/
-    z-index: -1;
 }
 
 /* Customize HTML paragraph element margins */
@@ -25,6 +25,10 @@ img {
   /*Image stays to the left of the body container*/
   float: left;
   margin-left: 30px;
+  margin-top: 30px;
+  position: absolute;
+  /* Increase the priority of the z-index so that the img can go on top */
+  z-index: 1;
 }
 
 .button {
@@ -133,53 +137,34 @@ a:hover{
     overflow: hidden;
 }
 
-/*For hamburger menu (triple bar icon) */
-/* Style the navigation menu */
-.topnav {
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  right: 14px;
+  width: 98.2%;
   overflow: hidden;
   background-color: maroon;
-  position: fixed;
-  margin-right: 14px;
-  margin-top: 9px;
-  top: 0;
-  right: 0;
 }
 
-/* Hide the links inside the navigation menu (except for logo/home) */
-.topnav #myLinks {
-  display: none;
+li {
+  float: left;
 }
 
-/* Style navigation menu links */
-.topnav a {
-  /* Color of all the text */
-  color: #ffbb00;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-  font-family: "Biome", sans-serif;
+li a {
   display: block;
-}
-
-/* Style the hamburger menu */
-.topnav a.icon {
-  background: maroon;
-  display: block;
-  position: fixed;
-  margin-right: 14px;
-  margin-top: 9px;
-  right: 0;
-  top: 0;
-}
-
-/* Add a grey background color on mouse-over */
-.topnav a:hover {
-  background-color: maroon;
   color: white;
+  text-align: center;
+  padding: 14px 16px;
+  font-family: "Raleway", sans-serif;
+  text-decoration: none;
 }
 
-/* Style the active link (or home/logo) */
-.active {
-  background-color: maroon;
-  color: #ffbb00;
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: #ffbb00;
+  /* Remove underlines from links */
+  text-decoration: none;
 }
