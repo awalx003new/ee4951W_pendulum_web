@@ -33,10 +33,10 @@
 
       <body>
         <form method="get" action="{{ url_for('download', filename="results.csv") }}">
-            <button type="submit">Download Results File</button>
+            <button type="submit" id=button2>Download Results File</button>
         </form>
-
-          <button onClick="window.location.href='http://127.0.0.1:5000/index';">Upload Another File!</button>
+        <br>
+          <button onClick="window.location.href='http://127.0.0.1:5000/index';" id=button3>Upload Another File!</button>
 
       </body>
 

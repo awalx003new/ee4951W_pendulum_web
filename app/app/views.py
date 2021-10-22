@@ -1,5 +1,5 @@
-#---------------------------------------------------------imports---------------------------------------------------------------#
-from flask import Flask, jsonify, request, render_template, make_response, redirect, url_for, send_from_directory, flash, Request
+#---------------------------------------------------------imports-------------------------------------------------------------------------#
+from flask import Flask, jsonify, request, render_template, make_response, redirect, url_for, send_from_directory, flash, Request, Response
 # Use for operating system functionalities
 import os
 # Use for generating random secret key
@@ -35,6 +35,7 @@ PROCESSING_FILE = "upload.py"
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 #---------------------------------------------------------decorators---------------------------------------------------------------#
 # For domain name
 @app.route('/')
@@ -50,6 +51,7 @@ def favicon():
 def actuatepage():
     return render_template("index.html")
 
+
 # Redirect to route for index
 # Receive form data from upload
 @app.route('/index', methods=['POST'])
@@ -59,8 +61,6 @@ def upload_file():
         flash('No file part')
         return render_template("index.html")
 
-    #fileSize = request.cookies.get("filesize")
-
     uploaded_file = request.files['file']
     if uploaded_file.filename == '':
         # Display this message in the website when the user has not chosen a file
@@ -68,30 +68,36 @@ def upload_file():
         return render_template("index.html")
 
     if uploaded_file and allowed_file(uploaded_file.filename):
-        # Create "Uploads" folder
-        uploads_dir = "Uploads"
+        # # Create "Uploads" folder
+        # uploads_dir = "Uploads"
+        #
+        # absolutepath = os.path.abspath(__file__)
+        #
+        # fileDirectory = os.path.dirname(absolutepath)
+        #
+        # #Navigate to ./FileProcessing directory
+        # newPath1 = os.path.join(fileDirectory, 'FileProcessing')
+        #
+        # #Navigate to ./Uploads directory
+        # newPath2 = os.path.join(newPath1, uploads_dir)
 
-        absolutepath = os.path.abspath(__file__)
-        #print(absolutepath)
 
-        fileDirectory = os.path.dirname(absolutepath)
-        #print(fileDirectory)
+        p1 = get_file_processing_path()
+        # print("This is p1")
+        # print(p1)
 
-        #Navigate to ./FileProcessing directory
-        newPath1 = os.path.join(fileDirectory, 'FileProcessing')
-        #print(newPath1)
+        p2 = get_uploads_path(p1)
+        # print("This is p2")
+        # print(p2)
 
-        #Navigate to ./Uploads directory
-        newPath2 = os.path.join(newPath1, uploads_dir)
-        #print(newPath1)
 
         # Make directory called "Uploads"
         # mode: read, write, and execute permissions for user, owner, and group
         mode = 0o777
-        os.mkdir(newPath2, mode)
+        os.mkdir(p2, mode)
 
         # change directory to "Uploads"
-        os.chdir(newPath2)
+        os.chdir(p2)
 
         # Get the file name
         nameOfFile = secure_filename(uploaded_file.filename)
@@ -116,25 +122,6 @@ def upload_file():
         # Close the upload.py file object
         processingFile.close()
 
-        #-----------------------------------Run Test File--------------------------------------------------------------------------------------
-
-        #PLEASE note: What's below seems to work, but something I noticed is that if the test file has "import" lines, those modules that Python is looking for won't be found
-        # Run new python script
-        # Popen has an array of command line arguments; execute "python3" program, with ("Uploads/" conconcatenated with "filename") command for process
-        # "python3" is used because we are using a Raspberry Pi terminal
-        # process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
-
-        #Add timer - so that subprocess can stop after a certain amount of time
-        # try:
-        #     process.wait()
-        #     print("Program exited normally!\n")
-        # except:
-        #     print("Exception occurred running program!\n")
-        #     process.terminate()
-        # finally:
-        #     #Make sure this works
-        #     GPIO.cleanup()
-        #-----------------------------------End of running Test File--------------------------------------------------------------------------------------
 
         # Retrieve the name of the userFile - without the file extension "py"
         results_custom_filename = nameOfFile.split(".")[0]
@@ -144,16 +131,15 @@ def upload_file():
 
         #--------------------------------------------Create "Results" folder---------------------------------------------------
 
-        results_dir = "Results"
-
-        #Navigate to ./Results directory
-        newPath3 = os.path.join(newPath1, results_dir)
+        p3 = get_results_path(p1);
+        # print("This is p3")
+        # print(p3)
 
         # Make directory called "Results"
-        os.mkdir(newPath3, mode)
+        os.mkdir(p3, mode)
 
         # change directory to "Results"
-        os.chdir(newPath3)
+        os.chdir(p3)
 
         # Now, actually create that file
         customResultsFile = open(RESULTS_DESTINATION + "/" + results_custom_filename, "x")
@@ -169,10 +155,52 @@ def upload_file():
         # Display this message in the website when the user has chosen a non-Python file
         flash('The file type specified is not allowed for upload.  Allowed file type is .py', "danger")
         return render_template('index.html')
-    # ---------------------------------Remove contents of Results folder------------------------------------------------------
 
-    # Change back to FileProcessing folder (from current working directory) so we can properly delete Results folder later on
+    #--------------------------------------------------------------------------------------------------------------------------
+    #return redirect(url_for('results_page'))
+    # Status code 204 is No Content - want to allow user to be able to click "Actuate" button on index.html page
+    return Response(response=None, status=204)
+
+
+def get_file_processing_path():
+    # Create "Uploads" folder
+    uploads_dir = "Uploads"
+
+    absolutepath = os.path.abspath(__file__)
+
+    fileDirectory = os.path.dirname(absolutepath)
+
+    #Navigate to ./FileProcessing directory
+    newPath1 = os.path.join(fileDirectory, 'FileProcessing')
+
+    return newPath1
+
+def get_uploads_path(file_processing_path):
+    # Create "Uploads" folder
+    uploads_dir1 = "Uploads"
+
+    #Navigate to ./Uploads directory
+    newPath2 = os.path.join(file_processing_path, uploads_dir1)
+
+    return newPath2
+
+def get_results_path(file_processing_path):
+    results_dir = "Results"
+
+    #Navigate to ./Results directory
+    newPath3 = os.path.join(file_processing_path, results_dir)
+
+    return newPath3
+
+def delete_files():
+    #---------------------------------Remove contents of Results folder------------------------------------------------------
+
+    #Change back to FileProcessing folder (from current working directory) so we can properly delete Results folder later on
     os.chdir("..")
+
+    newPath1 = get_file_processing_path()
+    newPath2 = get_uploads_path(newPath1)
+    newPath3 = get_results_path(newPath1)
 
     # Get list of all files in Results folder
     results_files_list = os.listdir(newPath3)
@@ -206,10 +234,59 @@ def upload_file():
     except OSError as e:
         print("Error: %s : %s" % (newPath2, e.strerror))
 
-    #--------------------------------------------------------------------------------------------------------------------------
+@app.route('/call_subprocess')
+def run_test_file():
+    # print("Current working directory: ")
+    # print(os.getcwd())
+
+    # Create "Uploads" folder
+    uploads_dir1 = "Uploads"
+
+    absolutepath1 = os.path.abspath(__file__)
+    #print(absolutepath)
+
+    fileDirectory1 = os.path.dirname(absolutepath1)
+    #print(fileDirectory)
+
+    #Navigate to ./FileProcessing directory
+    newPath4 = os.path.join(fileDirectory1, 'FileProcessing')
+    #print(newPath1)
+
+    #Navigate to ./Uploads directory
+    newPath5 = os.path.join(newPath4, uploads_dir1)
+    #print(newPath5)
+
+    os.chdir(newPath5)
+
+    # print("Current working directory: ")
+    # print(os.getcwd())
+
+    #-----------------------------------Run Test File--------------------------------------------------------------------------------------
+
+    #PLEASE note: What's below seems to work, but something I noticed is that if the test file has "import" lines, those modules that Python is looking for won't be found
+    # Run new python script
+    # Popen has an array of command line arguments; execute "python3" program, with ("Uploads/" conconcatenated with "filename") command for process
+    # "python3" is used because we are using a Raspberry Pi terminal
+    # process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+
+    #The line below is for LINUX testing
+    #process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+    #The line below is for WINDOWS testing
+    process = subprocess.Popen(["python", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+
+    #Add timer - so that subprocess can stop after a certain amount of time
+    #See https://stackoverflow.com/questions/42601478/flask-calling-python-function-on-button-onclick-event
+    try:
+        process.wait()
+        print("Program exited normally!\n")
+    except:
+        print("Exception occurred running program!\n")
+        process.terminate()
+    finally:
+        #Make sure this works
+        #GPIO.cleanup()
+        delete_files();
     return redirect(url_for('results_page'))
-    #return render_template("index.html")
-    #return "File upload is successful!"
 
 @app.route('/results')
 def results_page():

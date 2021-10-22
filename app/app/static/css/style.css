@@ -31,20 +31,75 @@ img {
   z-index: 1;
 }
 
-.button {
-    background-color: gold;
+/*-------------------------Buttons-----------------------------------------------------*/
+
+/* Used for id=button1 */
+#button1 {
+    background-color: #0a3f73;
     border: solid;
     border-color:#d5d6d2;
-    color: black;
-    padding: 15px 32px;
+    color: white;
+    padding: 10px 20px;
     text-align: center;
     text-decoration: none;
+    font-family: "Constantia", sans-serif;
+    border-radius: 10px;
     display: inline-block;
-    font-size: 16px;
+    font-size: 20px;
 }
 
-.button:hover{
+/* Used for id=button1 - What the button looks like when a user puts one's cursor on it */
+#button1:hover{
     background-color: white;
+    color: maroon;
+    cursor: pointer;
+}
+
+/* Used for id=button2 */
+#button2 {
+    /* #ebcba9 is similar to a tan color */
+    background-color: #ebcba9;
+    border: solid;
+    border-color:#d5d6d2;
+    /* #693100 is similar to a brown color */
+    color: #693100;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Constantia", sans-serif;
+    border-radius: 10px;
+    display: inline-block;
+    font-size: 20px;
+}
+
+/* Used for id=button2 - What the button looks like when a user puts one's cursor on it */
+#button2:hover{
+    background-color: white;
+    color: #0a3f73;
+    cursor: pointer;
+}
+
+/* Used for id=button2 */
+#button3 {
+    /* #cf7d4e is similar to a light brown color */
+    background-color: #cf7d4e;
+    border: solid;
+    border-color:#d5d6d2;
+    /* #094f02 is similar to a dark green color */
+    color: #094f02;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Constantia", sans-serif;
+    border-radius: 10px;
+    display: inline-block;
+    font-size: 20px;
+}
+
+/* Used for id=button2 - What the button looks like when a user puts one's cursor on it */
+#button3:hover{
+    background-color: white;
+    color: maroon;
     cursor: pointer;
 }
 
@@ -52,10 +107,8 @@ a{
 	color:white;
 	text-decoration:none;
 }
-a:hover{
-	text-decoration:underline
-}
 
+/* Used for id=main */
 #main{
     color: black;
     background-color: #d5d6d2;
