@@ -122,12 +122,40 @@ a{
     font-size: large;
 }
 
-#title{
+/* Used for id=title1 */
+#title1{
     font-size: xx-large;
+}
+
+/* Used for id=title2 */
+#title2{
+    font-size: xx-large;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* Used for id=title3 */
+#title3{
+    font-size: xx-large;
+    font-weight: bold;
+    margin-top: 15px;
 }
 
 #subtitle{
     font-size: large;
+}
+
+#subtitle1{
+    font-size: 23px;
+}
+
+#Background{
+    color: #ffbb00;
+}
+
+#Pendulum_info{
+  /* #4294cf is similar to a light blue color */
+  color: #4294cf;
 }
 
 #choose_file{
@@ -138,6 +166,13 @@ a{
 
 #submit{
 
+}
+
+/* Used for id=Start */
+#Start{
+    font-size: 25px;
+    font-weight: bold;
+    color: #ffbb00;
 }
 
 #myProgress {
@@ -190,14 +225,38 @@ a{
     overflow: hidden;
 }
 
-ul {
+#firstPage {
   list-style-type: none;
   margin: 0;
   padding: 0;
   position: absolute;
-  top: 0;
+  top: -4px;
   right: 14px;
   width: 98.2%;
+  overflow: hidden;
+  background-color: maroon;
+}
+
+#secondPage {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: -40px;
+  right: 15px;
+  width: 98.1%;
+  overflow: hidden;
+  background-color: maroon;
+}
+
+#thirdPage {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: -40px;
+  right: 15px;
+  width: 98.1%;
   overflow: hidden;
   background-color: maroon;
 }
@@ -215,9 +274,10 @@ li a {
   text-decoration: none;
 }
 
-/* Change the link color to #111 (black) on hover */
+/* Change the link color to #0a3f73 (similar to dark blue) on hover */
 li a:hover {
   background-color: #ffbb00;
+  color: #0a3f73;
   /* Remove underlines from links */
   text-decoration: none;
 }

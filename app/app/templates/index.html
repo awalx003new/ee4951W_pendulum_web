@@ -13,11 +13,11 @@
   <div class="row">
     <div class="col">
 
-      <h1 id="title">Homepage</h1>
+      <h1 id="title2">Homepage</h1>
       <hr>
 
       <body>
-        <h3>Please upload a Python file (.py file extension) onto the Inverted Pendulum</h3>
+        <h3 id="subtitle1">Please upload a Python file (.py file extension) onto the Inverted Pendulum</h3>
           <!--**************************Send form data to web server**************************-->
           <form method="POST" action="http://localhost:5000/index" enctype="multipart/form-data">
           <p><input type="file" name="file" accept=".py"></p>
@@ -28,6 +28,12 @@
         <div id="myProgress">
           <div id="myBar"></div>
         </div>
+
+        <ul id=secondPage>
+          <li><a href="http://127.0.0.1:5000">Home</a></li>
+          <li><a href="http://127.0.0.1:5000/index">To the Pendulum!</a></li>
+          <li><a href="http://127.0.0.1:5000/github_repo">Our GitHub Repository</a></li>
+        </ul>
 
       </body>
 
@@ -62,7 +68,7 @@
 
       <div class="mb-3">
         <div class="form-group">
-          <label>Start pendulum:</label>
+          <label id="Start">Start pendulum: </label>
             <!-- <button class="btn btn-primary" id="onbutton">Actuate!</button> -->
             <button type="button" id=button1 onclick="window.location.href='{{ url_for( 'run_test_file') }}';">Actuate!</button>
         </div>

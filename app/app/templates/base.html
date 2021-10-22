@@ -14,7 +14,7 @@
     <img src="static/img/site_logo.png" alt="Server and Pendulum" width="160" height="130">
 		<title>Remotely Accessible Inverted Pendulum</title>
 		<nav class = "header">
-            <h1 id="title">Remotely Accessible Inverted Pendulum</h1>
+            <h1 id="title1">Remotely Accessible Inverted Pendulum</h1>
 
           <!--  <button class="button" onclick="toggleAbout()">About</button> -->
 
@@ -25,14 +25,16 @@
                   Advisor: Professor Andrew Lamperski <br>
                   Sponsored by the University of Minnesota - Twin Cities <br>
               </h2>
-              <h1>Background</h1>
+              <br>
+              <h1 id="Background">Background</h1>
               <p>
-                  Our team developed an inverted pendulum system that could be accessed over a computer network for use by students.
+                  Our teams developed an inverted pendulum system that could be accessed over a computer network for use by students.
                   The inverted pendulum is a common controls problem used in academia.
                   This problem teaches students concepts of control loops, data filtering, and machine learning.
               </p>
+              <br>
 
-                <h1> What is an Inverted Pendulum? </h1>
+                <h1 id="Pendulum_info"> What is an Inverted Pendulum? </h1>
                 <p>
                     A vertical pendulum that is balanced via the base moving. <br>
                     Controlled movements are determined by measuring the position and speed of the pendulum and base.
@@ -54,7 +56,7 @@
             {% endblock %}
         </div>
 
-          <ul>
+          <ul id=firstPage>
             <li><a href="http://127.0.0.1:5000">Home</a></li>
             <li><a href="http://127.0.0.1:5000/index">To the Pendulum!</a></li>
             <li><a href="http://127.0.0.1:5000/github_repo">Our GitHub Repository</a></li>
