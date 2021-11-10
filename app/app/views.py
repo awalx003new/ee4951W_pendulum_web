@@ -8,6 +8,7 @@ import secrets
 import subprocess
 #import RPi.GPIO as GPIO
 from werkzeug.utils import secure_filename
+import time # Used for sleep()
 
 # The 'static_folder' argument is the folder with static files that is served at
 app = Flask(__name__, static_folder='static')
@@ -22,6 +23,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 DOWNLOAD_DIRECTORY = "./FileProcessing/Downloads"
 UPLOAD_DESTINATION = "."
 RESULTS_DESTINATION = "."
+INITIALIZE_SYSTEM = "initialize_system.py"
 
 # Uploads folder is in current directory after changing directory to ./FileProcessing/Uploads directory
 app.config['UPLOAD_FOLDER'] = UPLOAD_DESTINATION
@@ -83,10 +85,14 @@ def upload_file():
 
 
         p1 = get_file_processing_path()
+        #print("First - get file processing path")
+        #print(os.getcwd())
         # print("This is p1")
         # print(p1)
 
         p2 = get_uploads_path(p1)
+        #print("Second - get file processing path")
+        #print(os.getcwd())
         # print("This is p2")
         # print(p2)
 
@@ -132,6 +138,8 @@ def upload_file():
         #--------------------------------------------Create "Results" folder---------------------------------------------------
 
         p3 = get_results_path(p1);
+        print("Third - get file processing path")
+        print(os.getcwd())
         # print("This is p3")
         # print(p3)
 
@@ -151,12 +159,23 @@ def upload_file():
         with open(RESULTS_DESTINATION + "/" + results_custom_filename, "r") as customResultsFile:
             resultsContents = customResultsFile.read()
             # "customResultsFile.close()" automatically called with "with...as" statement
+        
+        #Navigate up the directory TWICE to reset the current working directory for 
+        #later calls to get_file_processing_path() and get_uploads_path()
+        os.chdir("..")
+        os.chdir("..")
+	
+        #print("Cur dir A")
+        #print(os.getcwd())
     else:
         # Display this message in the website when the user has chosen a non-Python file
         flash('The file type specified is not allowed for upload.  Allowed file type is .py', "danger")
         return render_template('index.html')
 
     #--------------------------------------------------------------------------------------------------------------------------
+    #print("Cur dir A")
+    #Current working directory here is the Results folder
+    #print(os.getcwd())
     #return redirect(url_for('results_page'))
     # Status code 204 is No Content - want to allow user to be able to click "Actuate" button on index.html page
     return Response(response=None, status=204)
@@ -168,10 +187,19 @@ def get_file_processing_path():
 
     absolutepath = os.path.abspath(__file__)
 
+    #print("absolutepath")
+    #print(absolutepath)
+
     fileDirectory = os.path.dirname(absolutepath)
+
+    #print("fileDirectory")
+    #print(fileDirectory)
 
     #Navigate to ./FileProcessing directory
     newPath1 = os.path.join(fileDirectory, 'FileProcessing')
+    
+    #print("newPath1 - get file processing path")
+    #print(newPath1)
 
     return newPath1
 
@@ -180,7 +208,11 @@ def get_uploads_path(file_processing_path):
     uploads_dir1 = "Uploads"
 
     #Navigate to ./Uploads directory
+
     newPath2 = os.path.join(file_processing_path, uploads_dir1)
+
+    #print("newPath2 - get_uploads_path")
+    #print(newPath2)
 
     return newPath2
 
@@ -190,17 +222,33 @@ def get_results_path(file_processing_path):
     #Navigate to ./Results directory
     newPath3 = os.path.join(file_processing_path, results_dir)
 
+    #print("newPath3 - get_results_path")
+    #print(newPath3)
+
     return newPath3
 
 def delete_files():
     #---------------------------------Remove contents of Results folder------------------------------------------------------
 
-    #Change back to FileProcessing folder (from current working directory) so we can properly delete Results folder later on
+    #print("Current working directory in delete_files()")
+    #print(os.getcwd())
+
+    #Change back to app/app/ folder (from current working directory) so we can properly delete Results folder later on
+    os.chdir("..")
     os.chdir("..")
 
+    #print("Current working directory in delete_files()")
+    #print(os.getcwd())
+
     newPath1 = get_file_processing_path()
+    #print("newPath1")
+    #print(newPath1)
     newPath2 = get_uploads_path(newPath1)
+    #print("newPath2")
+    #print(newPath2)
     newPath3 = get_results_path(newPath1)
+    #print("newPath3")
+    #print(newPath3)
 
     # Get list of all files in Results folder
     results_files_list = os.listdir(newPath3)
@@ -236,30 +284,48 @@ def delete_files():
 
 @app.route('/call_subprocess')
 def run_test_file():
-    # print("Current working directory: ")
-    # print(os.getcwd())
+    #print("1")
+    firstPath = get_file_processing_path()
+    #print("Fourth - get file processing path")
+    #print(os.getcwd())
+    #print("This is firstPath")
+    #print(firstPath)
+
+    secondPath = get_uploads_path(firstPath)
+    #print("Fifth - get file processing path")
+    #print(os.getcwd())
+    #print("This is secondPath")
+    #print(secondPath)
+    
+    #print("EXTRA COMMENTS HERE")
+
 
     # Create "Uploads" folder
     uploads_dir1 = "Uploads"
-
+   
     absolutepath1 = os.path.abspath(__file__)
-    #print(absolutepath)
+    #print("absolutepath1")
+    #print(absolutepath1)
 
     fileDirectory1 = os.path.dirname(absolutepath1)
-    #print(fileDirectory)
+    #print("fileDirectory1")
+    #print(fileDirectory1)
 
     #Navigate to ./FileProcessing directory
     newPath4 = os.path.join(fileDirectory1, 'FileProcessing')
-    #print(newPath1)
+    #newPath4 = fileDirectory1
+    #print("newPath4")
+    #print(newPath4)
 
     #Navigate to ./Uploads directory
     newPath5 = os.path.join(newPath4, uploads_dir1)
+    #print("newPath5")
     #print(newPath5)
 
     os.chdir(newPath5)
 
-    # print("Current working directory: ")
-    # print(os.getcwd())
+    #print("Current working directory (run_test_file): ")
+    #print(os.getcwd())
 
     #-----------------------------------Run Test File--------------------------------------------------------------------------------------
 
@@ -268,11 +334,24 @@ def run_test_file():
     # Popen has an array of command line arguments; execute "python3" program, with ("Uploads/" conconcatenated with "filename") command for process
     # "python3" is used because we are using a Raspberry Pi terminal
     # process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+    # Run the initialize_system.py
+    # Change directory so that we can run initialize_system.py
+    os.chdir('/home/pi/pendulum/System')
 
+    processA = subprocess.Popen(["python3", INITIALIZE_SYSTEM])
+    # 20 second delay - wait for initialize_system.py to end
+    time.sleep(10) 
+
+    # FIX this - no hard coding!!!!!!!
+    #os.chdir("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads")
+    #os.chdir("/home/pi/pendulum/System")
+    #os.symlink("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads","/home/pi/pendulum/System")
     #The line below is for LINUX testing
-    #process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+    process = subprocess.Popen(["python3", "/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads" + "/" + PROCESSING_FILE])
+
+    
     #The line below is for WINDOWS testing
-    process = subprocess.Popen(["python", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
+    #process = subprocess.Popen(["python", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
 
     #Add timer - so that subprocess can stop after a certain amount of time
     #See https://stackoverflow.com/questions/42601478/flask-calling-python-function-on-button-onclick-event
@@ -285,7 +364,11 @@ def run_test_file():
     finally:
         #Make sure this works
         #GPIO.cleanup()
-        delete_files();
+        os.chdir("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads")
+        delete_files()
+
+    # For processA
+    processA.terminate()
     return redirect(url_for('results_page'))
 
 @app.route('/results')
@@ -308,6 +391,23 @@ def gitHub_repo():
 
 #--------------------------------Run the application-----------------------------------------
 if __name__ == '__main__':
+    print("line 1")
+    os.chdir('/home/pi/pendulum/System')
+    print("line 2")
+    print("current working directory - main")
+    print(os.getcwd())
+    print("line 3")
+    #counter = 0
+    #counter = counter + 1
+    #if counter== 1:
+           # Initialize the system before accepting any files.
+           #subprocess.Popen(["python3", SYSTEM_DESTINATION + INITIALIZE_SYSTEM])
+    print("line 4")
+    # Run the web client to start receiving files.
+    #app.run(host="192.168.1.10", port=8000)
+
+    os.chdir("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app")
+    print("line 5")
     #repopulate app.routes with static IP address for controls lab
     #Use Sam's domain name (DNS) instead of local host
     #IMPORTANT: DNS=192.168.71.241
