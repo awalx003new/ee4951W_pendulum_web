@@ -25,7 +25,7 @@ RESULTS_DESTINATION = "."
 INITIALIZE_SYSTEM = "initialize_system.py"
 default_results_filename = "results.csv"
 
-# Uploads folder is in current directory after changing directory to ./FileProcessing/Uploads directory
+# Uploads folder is in current directory that gets navigated to later in the program
 app.config['UPLOAD_FOLDER'] = UPLOAD_DESTINATION
 
 ALLOWED_EXTENSIONS = {'py'}
