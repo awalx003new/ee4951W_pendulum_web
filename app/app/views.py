@@ -6,7 +6,7 @@ import os
 import secrets
 # Use for running a python script
 import subprocess
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 from werkzeug.utils import secure_filename
 import time # Used for sleep()
 
@@ -20,10 +20,10 @@ app.secret_key = secrets.token_hex()
 # Maximum file size is 16 MB
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
-DOWNLOAD_DIRECTORY = "./FileProcessing/Downloads"
 UPLOAD_DESTINATION = "."
 RESULTS_DESTINATION = "."
 INITIALIZE_SYSTEM = "initialize_system.py"
+default_results_filename = "results.csv"
 
 # Uploads folder is in current directory after changing directory to ./FileProcessing/Uploads directory
 app.config['UPLOAD_FOLDER'] = UPLOAD_DESTINATION
@@ -31,6 +31,22 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_DESTINATION
 ALLOWED_EXTENSIONS = {'py'}
 # Name of test file
 PROCESSING_FILE = "upload.py"
+
+appapp = os.path.abspath(__file__)
+appapp2 =os.path.dirname(appapp)
+global processA
+global process
+
+import sys
+sys.path.insert(0, '/home/pi/pendulum/System')
+from motor import Motor
+from System.system import System
+import time
+from sys import exit
+
+# NOTE run "sudo python3 views.py" in the terminal
+
+global popenErrorString
 
 #---------------------------------------------------------methods------------------------------------------------------------------#
 # Only allow .py file extension
@@ -51,6 +67,15 @@ def favicon():
 # Create route for index
 @app.route('/index')
 def actuatepage():
+    os.chdir(appapp2)
+    #First, make sure we are in the pendulum/System folder
+    list_of_Paths = get_helpful_path()
+    #Check if uploads folder exists
+    uploads_folder_exist=os.path.isdir(list_of_Paths[3])
+    #If uploads folder exists, enter this if statement to delete it
+    if uploads_folder_exist==True:
+        delete_uploads_files()
+    os.chdir(list_of_Paths[0])
     return render_template("index.html")
 
 
@@ -58,6 +83,7 @@ def actuatepage():
 # Receive form data from upload
 @app.route('/index', methods=['POST'])
 def upload_file():
+
     # Check if the POST request has the file part
     if 'file' not in request.files:
         flash('No file part')
@@ -70,40 +96,16 @@ def upload_file():
         return render_template("index.html")
 
     if uploaded_file and allowed_file(uploaded_file.filename):
-        # # Create "Uploads" folder
-        # uploads_dir = "Uploads"
-        #
-        # absolutepath = os.path.abspath(__file__)
-        #
-        # fileDirectory = os.path.dirname(absolutepath)
-        #
-        # #Navigate to ./FileProcessing directory
-        # newPath1 = os.path.join(fileDirectory, 'FileProcessing')
-        #
-        # #Navigate to ./Uploads directory
-        # newPath2 = os.path.join(newPath1, uploads_dir)
-
-
-        p1 = get_file_processing_path()
-        #print("First - get file processing path")
-        #print(os.getcwd())
-        # print("This is p1")
-        # print(p1)
-
-        p2 = get_uploads_path(p1)
-        #print("Second - get file processing path")
-        #print(os.getcwd())
-        # print("This is p2")
-        # print(p2)
-
-
+        
+        get_some_paths = get_helpful_path()
+        
         # Make directory called "Uploads"
         # mode: read, write, and execute permissions for user, owner, and group
         mode = 0o777
-        os.mkdir(p2, mode)
+        os.mkdir(get_some_paths[3], mode)
 
         # change directory to "Uploads"
-        os.chdir(p2)
+        os.chdir(get_some_paths[3])
 
         # Get the file name
         nameOfFile = secure_filename(uploaded_file.filename)
@@ -127,260 +129,163 @@ def upload_file():
 
         # Close the upload.py file object
         processingFile.close()
-
-
-        # Retrieve the name of the userFile - without the file extension "py"
-        results_custom_filename = nameOfFile.split(".")[0]
-
-        # Create custom filename for results.csv file
-        results_custom_filename = results_custom_filename + "_results.csv"
-
-        #--------------------------------------------Create "Results" folder---------------------------------------------------
-
-        p3 = get_results_path(p1);
-        print("Third - get file processing path")
-        print(os.getcwd())
-        # print("This is p3")
-        # print(p3)
-
-        # Make directory called "Results"
-        os.mkdir(p3, mode)
-
-        # change directory to "Results"
-        os.chdir(p3)
-
-        # Now, actually create that file
-        customResultsFile = open(RESULTS_DESTINATION + "/" + results_custom_filename, "x")
-
-        # Close that file
-        customResultsFile.close()
-
-        # Name of file object is "results" - open it in read mode
-        with open(RESULTS_DESTINATION + "/" + results_custom_filename, "r") as customResultsFile:
-            resultsContents = customResultsFile.read()
-            # "customResultsFile.close()" automatically called with "with...as" statement
         
-        #Navigate up the directory TWICE to reset the current working directory for 
-        #later calls to get_file_processing_path() and get_uploads_path()
-        os.chdir("..")
-        os.chdir("..")
-	
-        #print("Cur dir A")
-        #print(os.getcwd())
+        os.chdir(get_some_paths[0])
+
     else:
         # Display this message in the website when the user has chosen a non-Python file
         flash('The file type specified is not allowed for upload.  Allowed file type is .py', "danger")
         return render_template('index.html')
 
-    #--------------------------------------------------------------------------------------------------------------------------
-    #print("Cur dir A")
-    #Current working directory here is the Results folder
-    #print(os.getcwd())
-    #return redirect(url_for('results_page'))
     # Status code 204 is No Content - want to allow user to be able to click "Actuate" button on index.html page
     return Response(response=None, status=204)
 
-
-def get_file_processing_path():
-    # Create "Uploads" folder
+      
+def get_helpful_path():
+    #Navigate to ./Downloads directory
+    csv_dir = "Downloads"
+    system_dir = "System"
     uploads_dir = "Uploads"
-
-    absolutepath = os.path.abspath(__file__)
-
-    #print("absolutepath")
-    #print(absolutepath)
-
-    fileDirectory = os.path.dirname(absolutepath)
-
-    #print("fileDirectory")
-    #print(fileDirectory)
-
-    #Navigate to ./FileProcessing directory
-    newPath1 = os.path.join(fileDirectory, 'FileProcessing')
+    pathList = []
+    backwards1 = os.path.abspath(__file__) 
+    #/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/views.py
+    backwards2 = os.path.dirname(backwards1) 
+    #/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app
+    backwards3 = os.path.dirname(backwards2) 
+    #/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app
+    backwards4 = os.path.dirname(backwards3)
+    #/home/pi/pendulum/Uploads/ee4951W_pendulum_web
+    backwards5 = os.path.dirname(backwards4) 
+    #/home/pi/pendulum/Uploads
+    backwards6 = os.path.dirname(backwards5) 
+    #/home/pi/pendulum   
+    sysPath = os.path.join(backwards6, system_dir)
+    downloadsPath = os.path.join(sysPath, csv_dir)
+    uploadsPath = os.path.join(sysPath, uploads_dir)
     
-    #print("newPath1 - get file processing path")
-    #print(newPath1)
-
-    return newPath1
-
-def get_uploads_path(file_processing_path):
-    # Create "Uploads" folder
-    uploads_dir1 = "Uploads"
-
-    #Navigate to ./Uploads directory
-
-    newPath2 = os.path.join(file_processing_path, uploads_dir1)
-
-    #print("newPath2 - get_uploads_path")
-    #print(newPath2)
-
-    return newPath2
-
-def get_results_path(file_processing_path):
-    results_dir = "Results"
-
-    #Navigate to ./Results directory
-    newPath3 = os.path.join(file_processing_path, results_dir)
-
-    #print("newPath3 - get_results_path")
-    #print(newPath3)
-
-    return newPath3
-
-def delete_files():
-    #---------------------------------Remove contents of Results folder------------------------------------------------------
-
-    #print("Current working directory in delete_files()")
-    #print(os.getcwd())
-
-    #Change back to app/app/ folder (from current working directory) so we can properly delete Results folder later on
-    os.chdir("..")
-    os.chdir("..")
-
-    #print("Current working directory in delete_files()")
-    #print(os.getcwd())
-
-    newPath1 = get_file_processing_path()
-    #print("newPath1")
-    #print(newPath1)
-    newPath2 = get_uploads_path(newPath1)
-    #print("newPath2")
-    #print(newPath2)
-    newPath3 = get_results_path(newPath1)
-    #print("newPath3")
-    #print(newPath3)
-
-    # Get list of all files in Results folder
-    results_files_list = os.listdir(newPath3)
-
-    # Remove all files in Results folder
-    for i in results_files_list:
-        os.remove(newPath3+"/"+i)
-        #print("here A")
-
-    try:
-        os.rmdir(newPath3)
-        #print("here B")
-    except OSError as e:
-        print("Error: %s : %s" % (newPath3, e.strerror))
-
+    pathList.append(backwards2) #/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app
+    pathList.append(sysPath) #/home/pi/pendulum/System 
+    pathList.append(downloadsPath) #/home/pi/pendulum/System/Downloads
+    pathList.append(uploadsPath) #/home/pi/pendulum/System/Uploads
+    
+    
+    return pathList
+    
+def delete_uploads_files():
     # ---------------------------------Remove contents of Uploads folder------------------------------------------------------
-    # Here, we are still at the FileProcessing folder
-
+    
+    paths = get_helpful_path()
     # Get list of all files in Uploads folder
-    results_files_list = os.listdir(newPath2)
+    uploads_files_list = os.listdir(paths[3])
 
     # Remove all files in Uploads folder
-    for j in results_files_list:
-        os.remove(newPath2+"/"+j)
-        #print("here C")
+    for j in uploads_files_list:
+        os.remove(paths[3]+"/"+j)
 
     # Delete Uploads folder
     try:
-        os.rmdir(newPath2)
-        #print("here D")
+        os.rmdir(paths[3])
     except OSError as e:
-        print("Error: %s : %s" % (newPath2, e.strerror))
-
+        print("Error: %s : %s" % (paths[3], e.strerror))
+    os.chdir(paths[0])
+    
 @app.route('/call_subprocess')
 def run_test_file():
-    #print("1")
-    firstPath = get_file_processing_path()
-    #print("Fourth - get file processing path")
-    #print(os.getcwd())
-    #print("This is firstPath")
-    #print(firstPath)
-
-    secondPath = get_uploads_path(firstPath)
-    #print("Fifth - get file processing path")
-    #print(os.getcwd())
-    #print("This is secondPath")
-    #print(secondPath)
     
-    #print("EXTRA COMMENTS HERE")
+    the_list = get_helpful_path()
 
+    # If testing the software functionality but not actuating the PENDULUM, 
+    # please comment the lines/blocks of code between the lines that only have the comment "software" 
+    # P.S. they are only found in this function!!
+    
+    #software
+    global processA
+    global process
+    mtr = Motor(17,27,22)
+    mtr.brake()
+    try:
+        processA.terminate()
+        print("Initialization actively terminated")
+    except:
+        print("Initialization already terminated")
+    try:
+        process.terminate()
+        print("User file actively terminated")
+    except:
+        print("User file already terminated")
+    mtr.brake()
+    
+    GPIO.cleanup()
+    #software
 
-    # Create "Uploads" folder
-    uploads_dir1 = "Uploads"
-   
-    absolutepath1 = os.path.abspath(__file__)
-    #print("absolutepath1")
-    #print(absolutepath1)
+    #-----------------------------------Run Test File-------------------------------------------------------------------------------------
+    # Popen() has an array of command line arguments
+    # "python3" is used because we are using a Raspbian OS terminal
 
-    fileDirectory1 = os.path.dirname(absolutepath1)
-    #print("fileDirectory1")
-    #print(fileDirectory1)
-
-    #Navigate to ./FileProcessing directory
-    newPath4 = os.path.join(fileDirectory1, 'FileProcessing')
-    #newPath4 = fileDirectory1
-    #print("newPath4")
-    #print(newPath4)
-
-    #Navigate to ./Uploads directory
-    newPath5 = os.path.join(newPath4, uploads_dir1)
-    #print("newPath5")
-    #print(newPath5)
-
-    os.chdir(newPath5)
-
-    #print("Current working directory (run_test_file): ")
-    #print(os.getcwd())
-
-    #-----------------------------------Run Test File--------------------------------------------------------------------------------------
-
-    #PLEASE note: What's below seems to work, but something I noticed is that if the test file has "import" lines, those modules that Python is looking for won't be found
-    # Run new python script
-    # Popen has an array of command line arguments; execute "python3" program, with ("Uploads/" conconcatenated with "filename") command for process
-    # "python3" is used because we are using a Raspberry Pi terminal
-    # process = subprocess.Popen(["python3", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
-    # Run the initialize_system.py
     # Change directory so that we can run initialize_system.py
-    os.chdir('/home/pi/pendulum/System')
-
-    processA = subprocess.Popen(["python3", INITIALIZE_SYSTEM])
-    # 20 second delay - wait for initialize_system.py to end
-    time.sleep(10) 
-
-    # FIX this - no hard coding!!!!!!!
-    #os.chdir("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads")
-    #os.chdir("/home/pi/pendulum/System")
-    #os.symlink("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads","/home/pi/pendulum/System")
-    #The line below is for LINUX testing
-    process = subprocess.Popen(["python3", "/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads" + "/" + PROCESSING_FILE])
-
+    #software
+    os.chdir(the_list[1])
+    #software
     
-    #The line below is for WINDOWS testing
+    # Run the initialize_system.py file
+    #software
+    processA = subprocess.Popen(["python3", INITIALIZE_SYSTEM])
+    #software
+
+    # The following waits for initialize_system.py to finish
+    #software
+    done = processA.poll()
+    while done==None:
+        done = processA.poll()
+        time.sleep(0.5)
+    #software
+
+    # The line below is for Raspbian OS testing
+    # subprocess.PIPE allows data to be sent to the process's stdin (standard input)
+    process = subprocess.Popen(["python3", the_list[3] + "/" + PROCESSING_FILE], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+
+    errorMessageList = process.communicate(timeout = None)
+
+    # errorMessageList[0] is for stdout_data
+    # errorMessageList[1] is for stderr_data
+
+    global popenErrorString
+    popenErrorString = errorMessageList[1]
+    # Use popenErrorString in /results route 
+    
+    # The line below is for WINDOWS OS testing
     #process = subprocess.Popen(["python", UPLOAD_DESTINATION + "/" + PROCESSING_FILE])
 
-    #Add timer - so that subprocess can stop after a certain amount of time
-    #See https://stackoverflow.com/questions/42601478/flask-calling-python-function-on-button-onclick-event
     try:
         process.wait()
         print("Program exited normally!\n")
     except:
         print("Exception occurred running program!\n")
         process.terminate()
-    finally:
-        #Make sure this works
-        #GPIO.cleanup()
-        os.chdir("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app/FileProcessing/Uploads")
-        delete_files()
-
+    
     # For processA
+    #software
     processA.terminate()
+    #software
+    os.chdir(the_list[0])
     return redirect(url_for('results_page'))
 
 @app.route('/results')
 def results_page():
+    # Display this message in the website to show 
+    flash(popenErrorString, "danger")
+    # Todo: Need to figure out how to display one flash message or the other (line 278 or line 281)
     # Display this message in the website after the file has been uploaded
-    flash('File uploaded successfully!', "success")
+    #flash('File uploaded successfully!', "success")
     return render_template("results.html")
 
 @app.route('/Downloads/<path:filename>', methods=['GET', 'POST'])
 def download(filename):
     try:
-        return send_from_directory(DOWNLOAD_DIRECTORY, filename, as_attachment=True)
+        something = get_helpful_path()
+        # Download directory = something[2]
+        # Get to new download directory
+        return send_from_directory(something[2], filename, as_attachment=True)
     except FileNotFoundError:
         abort(404)
 
@@ -391,27 +296,13 @@ def gitHub_repo():
 
 #--------------------------------Run the application-----------------------------------------
 if __name__ == '__main__':
-    print("line 1")
-    os.chdir('/home/pi/pendulum/System')
-    print("line 2")
-    print("current working directory - main")
-    print(os.getcwd())
-    print("line 3")
-    #counter = 0
-    #counter = counter + 1
-    #if counter== 1:
-           # Initialize the system before accepting any files.
-           #subprocess.Popen(["python3", SYSTEM_DESTINATION + INITIALIZE_SYSTEM])
-    print("line 4")
-    # Run the web client to start receiving files.
-    #app.run(host="192.168.1.10", port=8000)
-
+    # Change to the directory that contains this Python file you are currently reading (views.py)
     os.chdir("/home/pi/pendulum/Uploads/ee4951W_pendulum_web/app/app")
-    print("line 5")
-    #repopulate app.routes with static IP address for controls lab
-    #Use Sam's domain name (DNS) instead of local host
+    
     #IMPORTANT: DNS=192.168.71.241
-    #app.run(host="<IP_Address>", port=<port_number>, debug=True)
-    app.run(debug=True)
+    # Uncomment the line below is to run the server in debug mode - any errors will be indicated in the web browser 
+    #app.run(debug=True)
     # Allow operating system to listen on all public IP Addresses
-    # app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8080, threaded=True)
+
+

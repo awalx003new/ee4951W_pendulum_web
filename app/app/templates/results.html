@@ -17,7 +17,7 @@
       <h1 id="title3">Results</h1>
       <hr>
 
-        <!--The following lines are for the flash() message-->
+        <!--The following lines are for the success flash() messages-->
         {% with errors = get_flashed_messages(category_filter=["success"]) %}
               {% if errors %}
                   {%- for message in errors %}
@@ -31,32 +31,35 @@
               {% endif %}
           {% endwith %}
 
+        <!--The following lines are for the danger flash() messages-->
+        {% with errors = get_flashed_messages(category_filter=["danger"]) %}
+            {% if errors %}
+                {%- for message in errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h3>User code Error</h3>
+                          <span>{{ message }}</span>
+                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                    </div>
+                {% endfor -%}
+            {% endif %}
+        {% endwith %}
+
       <body>
         <form method="get" action="{{ url_for('download', filename="results.csv") }}">
             <button type="submit" id=button2>Download Results File</button>
         </form>
         <br>
-          <button onClick="window.location.href='http://127.0.0.1:5000/index';" id=button3>Upload Another File!</button>
+          <button onClick="window.location.href='/index';" id=button3>Upload Another File!</button>
 
           <ul id=thirdPage>
-            <li><a href="http://127.0.0.1:5000">Home</a></li>
-            <li><a href="http://127.0.0.1:5000/index">To the Pendulum!</a></li>
-            <li><a href="http://127.0.0.1:5000/github_repo">Our GitHub Repository</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/index">To the Pendulum!</a></li>
+            <li><a href="/github_repo">Our GitHub Repository</a></li>
           </ul>
 
       </body>
-
-      <!--The following lines are for the flash() message
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-            {{ message }}
-          {% endfor %}
-        {% endif %}
-      {% endwith %}-->
-
-
-
       <hr>
 
     </div>

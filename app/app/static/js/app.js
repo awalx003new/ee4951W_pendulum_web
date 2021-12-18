@@ -9,17 +9,6 @@ function showLoad(){
     }
 }
 
-/*
-function toggleAbout(){
-    var x = document.getElementById("about");
-    if (x.style.display === "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
-    }
-}
-*/
-
 // For dynamic progress bar for file upload
 function update() {
   var element = document.getElementById("myBar");
@@ -36,31 +25,4 @@ function update() {
   }
 }
 
-/*
-  function actuate() {
-    //print(<h4>Hello!<h4>)
 
-    fetch('${window.origin}/test',{
-      method: "POST",
-      credentials: "include",
-      body: JSON.stringify(entry),
-      cache: "no-cache",
-      headers: new Headers({
-        "content-type": "application/json"
-      })
-    })
-
-    .then(function (response) {
-      if (response.status !== 200) {
-        console.log(`Looks like there was a problem. Status code: ${response.status}`);
-        return;
-      }
-      response.json().then(function(data) {
-        console.log(data);
-      });
-    })
-
-    .catch(function(error) {
-      console.log("Fetch error: " + error);
-    });
-*/

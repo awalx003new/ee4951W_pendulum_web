@@ -19,7 +19,7 @@
       <body>
         <h3 id="subtitle1">Please upload a Python file (.py file extension) onto the Inverted Pendulum</h3>
           <!--**************************Send form data to web server**************************-->
-          <form method="POST" action="http://localhost:5000/index" enctype="multipart/form-data">
+          <form method="POST" action="/index" enctype="multipart/form-data">
           <p><input type="file" name="file" accept=".py"></p>
           <p><input type="submit" value="Upload File" onclick="update()"></p>
         </form>
@@ -30,9 +30,9 @@
         </div>
 
         <ul id=secondPage>
-          <li><a href="http://127.0.0.1:5000">Home</a></li>
-          <li><a href="http://127.0.0.1:5000/index">To the Pendulum!</a></li>
-          <li><a href="http://127.0.0.1:5000/github_repo">Our GitHub Repository</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/index">To the Pendulum!</a></li>
+          <li><a href="/github_repo">Our GitHub Repository</a></li>
         </ul>
 
       </body>
